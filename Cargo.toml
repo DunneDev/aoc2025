@@ -1,0 +1,2 @@
+[workspace]
+members = ["crates/utils","days/day01"]
