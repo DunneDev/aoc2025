@@ -51,14 +51,9 @@ fn traverse(bank: &Vec<u64>, stack: &mut Vec<u64>, index: usize) -> u64 {
         max
     } else {
         let joltage = stack
-            .iter()
-            .map(|e| e.to_string())
-            .reduce(|mut acc, e| {
-                acc.push_str(&e);
-                acc
-            })
-            .unwrap()
-            .parse()
+            .clone()
+            .into_iter()
+            .reduce(|acc, e| acc * 10 + e)
             .unwrap();
 
         stack.pop();
