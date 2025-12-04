@@ -4,59 +4,50 @@ pub fn solve() -> u64 {
     let mut joltage = 0;
     let lines = utils::read_lines("data/day03.txt").unwrap();
     for line in lines.map_while(Result::ok) {
-        let bank: Vec<u64> = line
+        let mut bank: Vec<(usize, u64)> = line
             .chars()
             .map(|c| c.to_digit(10).unwrap() as u64)
+            .enumerate()
             .collect();
 
-        let mut stack: Vec<u64> = vec![];
-        let mut max = 0u64;
-        let mut max_digit = 0u64;
-        for i in 0..=bank.len() - MAX_LEN {
-            if bank[i] <= max_digit {
-                continue;
+        let take_len = bank.len() - MAX_LEN + 1;
+        let mut digits: Vec<(usize, u64)> = vec![];
+        for _ in 0..MAX_LEN {
+            let mut iter = bank.clone().into_iter().take(take_len).filter(|&(i, _)| {
+                if digits.is_empty() {
+                    true
+                } else {
+                    digits.last().unwrap().0 < i
+                }
+            });
+
+            let mut max = iter.next().unwrap();
+            for digit in iter {
+                if digit.1 > max.1 {
+                    max = digit;
+                    if digit.1 == 9 {
+                        continue;
+                    }
+                }
             }
-            max_digit = bank[i];
 
-            let res = traverse(&bank, &mut stack, i);
-            if res > max {
-                max = res;
-            }
-        }
+            digits.push(max);
 
-        joltage += max;
-    }
-
-    joltage
-}
-
-fn traverse(bank: &Vec<u64>, stack: &mut Vec<u64>, index: usize) -> u64 {
-    stack.push(bank[index]);
-    if stack.len() != MAX_LEN {
-        let mut max = 0u64;
-        let mut max_digit = 0u64;
-        for i in (index + 1)..=(bank.len() + stack.len() - MAX_LEN) {
-            if bank[i] <= max_digit {
-                continue;
-            }
-            max_digit = bank[i];
-
-            let res = traverse(bank, stack, i);
-            if res > max {
-                max = res;
+            if let Some(pos) = bank.iter().position(|e| e.0 == max.0) {
+                bank.remove(pos);
             }
         }
 
-        stack.pop();
-        max
-    } else {
-        let joltage = stack
-            .clone()
-            .into_iter()
+        digits.sort_by(|a, b| a.0.cmp(&b.0));
+
+        let res = digits
+            .iter()
+            .map(|e| e.1)
             .reduce(|acc, e| acc * 10 + e)
             .unwrap();
 
-        stack.pop();
-        joltage
+        joltage += res;
     }
+
+    joltage
 }
