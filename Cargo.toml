@@ -1,3 +1,9 @@
 [workspace]
-members = ["crates/utils", "days/day01", "days/day02", "days/day03"]
+members = [
+  "crates/utils",
+  "days/day01",
+  "days/day02",
+  "days/day03",
+  "days/day04",
+]
 resolver = "3"
